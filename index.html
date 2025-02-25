@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>无人机表演</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      overflow: hidden;
+      background-color: #000;
+    }
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
+    }
+    .controls-wrapper {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+    .controls-wrapper:hover {
+      left: 0;
+    }
+    .controls {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 15px;
+      border-radius: 0 12px 12px 0;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      width: 320px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .controls button {
+      padding: 8px 12px;
+      background: #4CAF50;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 13px;
+      text-align: center;
+      width: 100%;
+    }
+    .category-title {
+      color: #fff;
+      font-size: 15px;
+      margin-top: 8px;
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      grid-column: 1 / -1;
+    }
+    .speed-control {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      color: white;
+    }
+    .file-label {
+      grid-column: 1 / -1;
+      display: block;
+      padding: 8px 12px;
+      background: #2196F3;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 13px;
+      text-align: center;
+    }
+    .controls button:hover {
+      background: #45a049;
+      transform: translateX(5px);
+    }
+    .file-input {
+      display: none;
+    }
+    .speed-control label {
+      font-size: 14px;
+    }
+    .speed-control input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      outline: none;
+    }
+    .speed-control input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      background: #2196F3;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .toggle-handle {
+      width: 40px;
+      height: 80px;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 0 8px 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .toggle-handle::after {
+      content: '⚙️';
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls-wrapper">
+    <div class="controls">
+      <div class="category-title">基础控制</div>
+      <button id="takeoff">起飞</button>
+      <button id="landing">降落</button>
+      <button id="flicker">关闭闪烁</button>
+      
+      <div class="speed-control">
+        <label for="speed">无人机速度</label>
+        <input type="range" id="speed" min="0.5" max="2" step="0.1" value="1">
+      </div>
+
+      <div class="category-title">经典图案</div>
+      <button id="flower">花朵</button>
+      <button id="heart">爱心</button>
+      <button id="dragon">中国龙</button>
+      <button id="phoenix">凤凰</button>
+      <button id="lace">蕾丝</button>
+
+      <div class="category-title">新增图案</div>
+      <button id="rocket">火箭</button>
+      <button id="year2025">2025</button>
+      <button id="moon">月亮</button>
+      <button id="spaceship">宇宙飞船</button>
+      <button id="buildings">高楼大厦</button>
+      <button id="nezha">哪吒</button>
+      <button id="flame">火焰</button>
+      <button id="fireworks">烟花</button>
+      <button id="riverside">清明上河图</button>
+      <button id="monalisa">蒙娜丽莎</button>
+
+      <div class="category-title">自定义</div>
+      <input type="file" id="imageUpload" class="file-input" accept="image/*">
+      <label for="imageUpload" class="file-label">上传图片</label>
+    </div>
+    <div class="toggle-handle"></div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
