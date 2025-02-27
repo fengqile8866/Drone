@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { gsap } from 'gsap';
+import { audioManager } from './audio.js';
 
 // 场景初始化
 const scene = new THREE.Scene();
@@ -18,6 +19,28 @@ camera.lookAt(0, 0, 0);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
+
+// 音频控制
+const audioToggleBtn = document.getElementById('audio-toggle');
+let isAudioEnabled = true;
+
+audioToggleBtn.addEventListener('click', () => {
+  isAudioEnabled = !isAudioEnabled;
+  if (isAudioEnabled) {
+    audioManager.toggleSound();
+    audioManager.toggleMusic();
+    audioManager.playMusic();
+    audioToggleBtn.textContent = '声音：开启';
+  } else {
+    audioManager.toggleSound();
+    audioManager.toggleMusic();
+    audioManager.pauseMusic();
+    audioToggleBtn.textContent = '声音：关闭';
+  }
+});
+
+// 初始化音频
+audioManager.playMusic();
 
 // 创建无人机粒子系统
 const DRONE_COUNT = 10000;
@@ -651,18 +674,24 @@ function animate() {
       }
     }
     
-    // 闪烁效果
+    // 优化的闪烁效果
     if (isFlickerEnabled) {
       const time = currentTime * 0.001;
-      const pulseRate = droneState.isGrounded ? 2 : 1.5;
-      const pulseDepth = droneState.isGrounded ? 0.3 : 0.2;
-      const baseFlicker = 0.97 + Math.sin(time * pulseRate + i * 0.1) * pulseDepth;
-      const randomFlicker = 0.97 + Math.random() * 0.06;
-      const flicker = baseFlicker * randomFlicker;
-      
+      // 为每个无人机设置独立的闪烁周期
+      const individualPhase = Math.sin(time + i * 0.1) * Math.PI;
+      // 添加随机因子，使闪烁更自然
+      const randomOffset = Math.sin(time * 0.5 + i * 0.3) * 0.3;
+      // 计算闪烁强度，确保不会完全熄灭
+      const flicker = 0.7 + (Math.sin(individualPhase) * 0.2) + randomOffset;
+      // 应用闪烁效果
       colors[i3] = baseColors[i3] * flicker;
       colors[i3 + 1] = baseColors[i3 + 1] * flicker;
       colors[i3 + 2] = baseColors[i3 + 2] * flicker;
+    } else {
+      // 不闪烁时保持原始颜色
+      colors[i3] = baseColors[i3];
+      colors[i3 + 1] = baseColors[i3 + 1];
+      colors[i3 + 2] = baseColors[i3 + 2];
     }
   }
   
@@ -686,3 +715,38 @@ function toggleFlicker() {
   isFlickerEnabled = !isFlickerEnabled;
   document.getElementById('flicker').textContent = isFlickerEnabled ? '关闭闪烁' : '开启闪烁';
 }
+
+// 音频控制
+document.getElementById('toggleSound').addEventListener('click', () => {
+  const enabled = audioManager.toggleSound();
+  document.getElementById('toggleSound').textContent = `音效：${enabled ? '开' : '关'}`;
+});
+
+document.getElementById('toggleMusic').addEventListener('click', () => {
+  const enabled = audioManager.toggleMusic();
+  document.getElementById('toggleMusic').textContent = `音乐：${enabled ? '开' : '关'}`;
+});
+
+document.getElementById('volume').addEventListener('input', (e) => {
+  audioManager.setVolume(parseFloat(e.target.value));
+});
+
+// 在相应的事件中播放音效
+document.getElementById('takeoff').addEventListener('click', () => {
+  audioManager.playSound('takeoff');
+});
+
+document.getElementById('landing').addEventListener('click', () => {
+  audioManager.playSound('landing');
+});
+
+// 为所有造型按钮添加音效
+const patternButtons = document.querySelectorAll('.controls button:not(#takeoff):not(#landing):not(#flicker):not(#toggleSound):not(#toggleMusic)');
+patternButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    audioManager.playSound('transform');
+  });
+});
+
+// 初始化音乐
+audioManager.playMusic();
